@@ -1,0 +1,5 @@
+services:
+  api:
+    volumes:
+      # Bind downloads to a local gitignored folder instead of the named volume
+      - ./downloads:/data/downloads

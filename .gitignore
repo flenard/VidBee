@@ -20,3 +20,7 @@ labels/
 statuses/
 
 .env
+
+# Local downloads (bind-mounted via docker-compose.override.yml)
+/downloads/*
+!/downloads/.gitkeep
