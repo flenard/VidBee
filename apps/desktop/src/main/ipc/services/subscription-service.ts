@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { SUBSCRIPTION_DUPLICATE_FEED_ERROR } from '@vidbee/subscriptions-core'
-import { type IpcContext, IpcMethod, IpcService } from 'electron-ipc-decorator'
+import { IpcMethod, IpcService } from 'electron-ipc-decorator'
 import type {
   SubscriptionResolvedFeed,
   SubscriptionRule,
@@ -30,20 +30,17 @@ class SubscriptionService extends IpcService {
   static readonly groupName = 'subscriptions'
 
   @IpcMethod()
-  async list(_context: IpcContext): Promise<SubscriptionRule[]> {
+  async list(): Promise<SubscriptionRule[]> {
     return listDesktopSubscriptionsSnapshot()
   }
 
   @IpcMethod()
-  resolve(_context: IpcContext, url: string): SubscriptionResolvedFeed {
+  resolve(url: string): SubscriptionResolvedFeed {
     return getDesktopSubscriptions().resolve({ rawUrl: url })
   }
 
   @IpcMethod()
-  async create(
-    _context: IpcContext,
-    options: CreateSubscriptionOptions
-  ): Promise<SubscriptionRule> {
+  async create(options: CreateSubscriptionOptions): Promise<SubscriptionRule> {
     const resolved = getDesktopSubscriptions().resolve({ rawUrl: options.url })
     const settings = settingsManager.getAll()
     const defaultDownloadDirectory = path.join(settings.downloadPath, 'Subscriptions')
@@ -78,7 +75,6 @@ class SubscriptionService extends IpcService {
 
   @IpcMethod()
   async update(
-    _context: IpcContext,
     id: string,
     updates: SubscriptionUpdatePayload
   ): Promise<SubscriptionRule | undefined> {
@@ -101,13 +97,13 @@ class SubscriptionService extends IpcService {
   }
 
   @IpcMethod()
-  async remove(_context: IpcContext, id: string): Promise<boolean> {
+  async remove(id: string): Promise<boolean> {
     await removeDesktopSubscription(id)
     return true
   }
 
   @IpcMethod()
-  async refresh(_context: IpcContext, id?: string): Promise<void> {
+  async refresh(id?: string): Promise<void> {
     if (id) {
       await getDesktopSubscriptions().refresh({ id })
     } else {
@@ -116,7 +112,7 @@ class SubscriptionService extends IpcService {
   }
 
   @IpcMethod()
-  async queueItem(_context: IpcContext, id: string, itemId: string): Promise<boolean> {
+  async queueItem(id: string, itemId: string): Promise<boolean> {
     const result = await getDesktopSubscriptions().itemsQueue({
       subscriptionId: id,
       itemId

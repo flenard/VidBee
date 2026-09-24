@@ -1,8 +1,9 @@
-import { BookOpen, Bug, Github } from 'lucide-react'
+import { BookOpen, Bug } from 'lucide-react'
 import { type MouseEvent, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Button, type ButtonProps } from './button'
+import Github from '~icons/lucide/github'
 
 export const DOWNLOAD_FEEDBACK_ISSUE_TITLE = '[Bug]: Download error report'
 

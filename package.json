@@ -1,6 +1,7 @@
 {
   "name": "vidbee-workspace",
   "private": true,
+  "packageManager": "pnpm@10.18.0",
   "scripts": {
     "check": "pnpm --filter ./apps/desktop run check",
     "check:i18n": "pnpm --filter ./apps/desktop run check:i18n",
@@ -37,7 +38,7 @@
   "devDependencies": {
     "@svgr/core": "^8.1.0",
     "@svgr/plugin-jsx": "^8.1.0",
-    "electron": "^38.3.0",
+    "electron": "^44.4.5",
     "husky": "^9.1.7"
   },
   "pnpm": {
@@ -47,22 +48,22 @@
       "esbuild"
     ],
     "overrides": {
-      "@orpc/client": ">=1.14.0 <2",
-      "@orpc/contract": ">=1.14.0 <2",
-      "@orpc/openapi": ">=1.14.0 <2",
-      "@orpc/server": ">=1.14.0 <2",
-      "@orpc/zod": ">=1.14.0 <2",
-      "electron": ">=39.8.5 <40",
+      "@orpc/client": ">=1.14.0",
+      "@orpc/contract": ">=1.14.0",
+      "@orpc/openapi": ">=1.14.0",
+      "@orpc/server": ">=1.14.0",
+      "@orpc/zod": ">=1.14.0",
+      "electron": ">=39.8.5",
       "undici": ">=7.24.0 <8",
-      "vite": ">=7.3.2 <8",
+      "vite": ">=7.3.2",
       "rollup": ">=4.59.0 <5",
       "next": ">=16.2.3",
-      "react-router": ">=7.12.0 <8",
+      "react-router": ">=7.12.0",
       "h3": ">=2.0.1-rc.18",
       "h3-v2": "npm:h3@>=2.0.1-rc.18",
-      "better-sqlite3": ">=12.9.0 <13",
-      "drizzle-orm": ">=0.45.2 <0.46",
-      "fastify": ">=5.8.5 <6",
+      "better-sqlite3": ">=12.9.0",
+      "drizzle-orm": ">=0.45.2",
+      "fastify": ">=5.8.5",
       "minimatch": ">=10.2.3",
       "picomatch@2": ">=2.3.2 <3",
       "picomatch@4": ">=4.0.4 <5",

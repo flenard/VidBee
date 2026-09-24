@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { type IpcContext, IpcMethod, IpcService } from 'electron-ipc-decorator'
+import { IpcMethod, IpcService } from 'electron-ipc-decorator'
 import { resolvePathWithHome } from '../../utils/path-helpers'
 
 class BrowserCookiesService extends IpcService {
@@ -170,7 +170,7 @@ class BrowserCookiesService extends IpcService {
   }
 
   @IpcMethod()
-  getBrowserProfilePath(_context: IpcContext, browser: string): string {
+  getBrowserProfilePath(browser: string): string {
     if (!browser || browser === 'none') {
       return ''
     }
@@ -218,7 +218,6 @@ class BrowserCookiesService extends IpcService {
 
   @IpcMethod()
   validateBrowserProfilePath(
-    _context: IpcContext,
     browser: string,
     profilePath: string
   ): { valid: boolean; reason?: string } {

@@ -7,18 +7,13 @@ import { Progress } from '@renderer/components/ui/progress'
 import { FeedbackLinkButtons } from '@vidbee/ui/components/ui/feedback-link-buttons'
 import { useAtom, useSetAtom } from 'jotai'
 import type { LucideIcon } from 'lucide-react'
-import {
-  Download,
-  Facebook,
-  Github,
-  Link as LinkIcon,
-  MessageSquare,
-  RefreshCw,
-  Twitter
-} from 'lucide-react'
+import { Download, Link as LinkIcon, MessageSquare, RefreshCw } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import Facebook from '~icons/lucide/facebook'
+import Github from '~icons/lucide/github'
+import Twitter from '~icons/lucide/twitter'
 import { ipcEvents, ipcServices } from '../lib/ipc'
 import { withDesktopUtm } from '../lib/url'
 import { updateAvailableAtom, updateReadyAtom } from '../store/update'

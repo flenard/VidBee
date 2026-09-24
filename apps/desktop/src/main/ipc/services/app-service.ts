@@ -1,6 +1,6 @@
 import os from 'node:os'
 import { app, BrowserWindow, dialog } from 'electron'
-import { type IpcContext, IpcMethod, IpcService } from 'electron-ipc-decorator'
+import { IpcMethod, IpcService } from 'electron-ipc-decorator'
 import { scopedLoggers } from '../../utils/logger'
 import { buildSiteIconUrl } from './site-icon-url'
 
@@ -8,17 +8,17 @@ class AppService extends IpcService {
   static readonly groupName = 'app'
 
   @IpcMethod()
-  getVersion(_context: IpcContext): string {
+  getVersion(): string {
     return app.getVersion()
   }
 
   @IpcMethod()
-  getPlatform(_context: IpcContext): string {
+  getPlatform(): string {
     return os.platform()
   }
 
   @IpcMethod()
-  getOsVersion(_context: IpcContext): string {
+  getOsVersion(): string {
     const platform = os.platform()
     const platformLabel =
       platform === 'darwin'
@@ -49,13 +49,12 @@ class AppService extends IpcService {
   }
 
   @IpcMethod()
-  quit(_context: IpcContext): void {
+  quit(): void {
     app.quit()
   }
 
   @IpcMethod()
   async showMessageBox(
-    _context: IpcContext,
     options: Electron.MessageBoxOptions
   ): Promise<Electron.MessageBoxReturnValue> {
     const window = BrowserWindow.getFocusedWindow()
@@ -70,7 +69,7 @@ class AppService extends IpcService {
   /**
    * Fetches a site icon and returns it as a data URL.
    */
-  async getSiteIcon(_context: IpcContext, domain: string): Promise<string | null> {
+  async getSiteIcon(domain: string): Promise<string | null> {
     try {
       const iconUrl = buildSiteIconUrl(domain)
       const response = await fetch(iconUrl)

@@ -1,5 +1,5 @@
 import { app } from 'electron'
-import { type IpcContext, IpcMethod, IpcService } from 'electron-ipc-decorator'
+import { IpcMethod, IpcService } from 'electron-ipc-decorator'
 import { autoUpdater } from 'electron-updater'
 
 const isNewerVersion = (latest: string, current: string): boolean => {
@@ -33,9 +33,7 @@ class UpdateService extends IpcService {
   static readonly groupName = 'update'
 
   @IpcMethod()
-  async checkForUpdates(
-    _context: IpcContext
-  ): Promise<{ available: boolean; version?: string; error?: string }> {
+  async checkForUpdates(): Promise<{ available: boolean; version?: string; error?: string }> {
     try {
       const currentVersion = app.getVersion()
       const result = await autoUpdater.checkForUpdates()
@@ -61,7 +59,7 @@ class UpdateService extends IpcService {
   }
 
   @IpcMethod()
-  async downloadUpdate(_context: IpcContext): Promise<{ success: boolean; error?: string }> {
+  async downloadUpdate(): Promise<{ success: boolean; error?: string }> {
     try {
       await autoUpdater.downloadUpdate()
       return { success: true }
@@ -74,17 +72,17 @@ class UpdateService extends IpcService {
   }
 
   @IpcMethod()
-  quitAndInstall(_context: IpcContext): void {
+  quitAndInstall(): void {
     autoUpdater.quitAndInstall()
   }
 
   @IpcMethod()
-  getCurrentVersion(_context: IpcContext): string {
+  getCurrentVersion(): string {
     return app.getVersion()
   }
 
   @IpcMethod()
-  isAutoUpdateEnabled(_context: IpcContext): boolean {
+  isAutoUpdateEnabled(): boolean {
     return true
   }
 }

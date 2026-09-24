@@ -4,8 +4,8 @@ import os from 'node:os'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
-import { clipboard, dialog, Notification, shell } from 'electron'
-import { type IpcContext, IpcMethod, IpcService } from 'electron-ipc-decorator'
+import { ClipboardItem, clipboard, dialog, Notification, shell } from 'electron'
+import { IpcMethod, IpcService } from 'electron-ipc-decorator'
 import { scopedLoggers } from '../../utils/logger'
 
 const execFileAsync = promisify(execFile)
@@ -14,7 +14,7 @@ class FileSystemService extends IpcService {
   static readonly groupName = 'fs'
 
   @IpcMethod()
-  async selectDirectory(_context: IpcContext): Promise<string | null> {
+  async selectDirectory(): Promise<string | null> {
     const result = await dialog.showOpenDialog({
       properties: ['openDirectory', 'createDirectory']
     })
@@ -27,7 +27,7 @@ class FileSystemService extends IpcService {
   }
 
   @IpcMethod()
-  async selectFile(_context: IpcContext): Promise<string | null> {
+  async selectFile(): Promise<string | null> {
     const result = await dialog.showOpenDialog({
       properties: ['openFile']
     })
@@ -49,7 +49,6 @@ class FileSystemService extends IpcService {
    */
   @IpcMethod()
   async validateCookiesFile(
-    _context: IpcContext,
     filePath: string
   ): Promise<{ valid: boolean; reason?: 'not-found' | 'sqlite' | 'binary' | 'not-netscape' }> {
     if (!filePath) {
@@ -98,7 +97,7 @@ class FileSystemService extends IpcService {
   }
 
   @IpcMethod()
-  getDefaultDownloadPath(_context: IpcContext): string {
+  getDefaultDownloadPath(): string {
     const fallbackPath = path.join(os.homedir(), 'Downloads')
 
     if (process.platform === 'linux' || process.platform === 'freebsd') {
@@ -119,7 +118,7 @@ class FileSystemService extends IpcService {
   }
 
   @IpcMethod()
-  async openFileLocation(_context: IpcContext, filePath: string): Promise<boolean> {
+  async openFileLocation(filePath: string): Promise<boolean> {
     try {
       if (!filePath) {
         return false
@@ -165,7 +164,7 @@ class FileSystemService extends IpcService {
   }
 
   @IpcMethod()
-  async openFile(_context: IpcContext, filePath: string): Promise<boolean> {
+  async openFile(filePath: string): Promise<boolean> {
     try {
       if (!filePath) {
         return false
@@ -194,7 +193,7 @@ class FileSystemService extends IpcService {
   }
 
   @IpcMethod()
-  async copyFileToClipboard(_context: IpcContext, filePath: string): Promise<boolean> {
+  async copyFileToClipboard(filePath: string): Promise<boolean> {
     try {
       if (!filePath) {
         return false
@@ -236,7 +235,7 @@ class FileSystemService extends IpcService {
   }
 
   @IpcMethod()
-  async openExternal(_context: IpcContext, url: string): Promise<boolean> {
+  async openExternal(url: string): Promise<boolean> {
     try {
       await shell.openExternal(url)
       return true
@@ -251,7 +250,6 @@ class FileSystemService extends IpcService {
    */
   @IpcMethod()
   showDownloadCompletedNotification(
-    _context: IpcContext,
     title: string,
     body: string,
     filePaths: string[],
@@ -337,10 +335,12 @@ class FileSystemService extends IpcService {
     buffer.writeUInt32LE(1, 16)
     encodedList.copy(buffer, dropFilesStructSize)
 
-    clipboard.writeBuffer('CF_HDROP', buffer)
-    clipboard.writeBuffer('Preferred DropEffect', Buffer.from([1, 0, 0, 0]))
-    clipboard.writeBuffer('FileNameW', Buffer.from(`${path.basename(resolvedPath)}\u0000`, 'ucs2'))
-    clipboard.writeBuffer('FileName', Buffer.from(`${path.basename(resolvedPath)}\u0000`, 'ascii'))
+    await this.writeRawClipboard({
+      CF_HDROP: buffer,
+      'Preferred DropEffect': Buffer.from([1, 0, 0, 0]),
+      FileNameW: Buffer.from(`${path.basename(resolvedPath)}\u0000`, 'ucs2'),
+      FileName: Buffer.from(`${path.basename(resolvedPath)}\u0000`, 'ascii')
+    })
   }
 
   private async copyFileToClipboardMac(resolvedPath: string): Promise<void> {
@@ -365,17 +365,32 @@ class FileSystemService extends IpcService {
       '</plist>'
     ]
     const plist = Buffer.from(entries.join('\n'), 'utf8')
-    clipboard.writeBuffer('NSFilenamesPboardType', plist)
-
     const fileUrl = pathToFileURL(resolvedPath).toString()
-    clipboard.writeBuffer('public.file-url', Buffer.from(`${fileUrl}\n`, 'utf8'))
+    await this.writeRawClipboard({
+      NSFilenamesPboardType: plist,
+      'public.file-url': Buffer.from(`${fileUrl}\n`, 'utf8')
+    })
   }
 
   private async copyFileToClipboardLinux(resolvedPath: string): Promise<void> {
     const fileUrl = pathToFileURL(resolvedPath).toString()
     const content = `copy\n${fileUrl}`
-    clipboard.writeBuffer('x-special/gnome-copied-files', Buffer.from(content, 'utf8'))
-    clipboard.writeBuffer('text/uri-list', Buffer.from(`${fileUrl}\n`, 'utf8'))
+    await this.writeRawClipboard({
+      'x-special/gnome-copied-files': Buffer.from(content, 'utf8'),
+      'text/uri-list': Buffer.from(`${fileUrl}\n`, 'utf8')
+    })
+  }
+
+  // Electron 44 replaced `clipboard.writeBuffer` with `clipboard.write`. Raw
+  // platform formats go through the `electron application/osclipboard` key.
+  private async writeRawClipboard(entries: Record<string, Buffer>): Promise<void> {
+    const item = Object.fromEntries(
+      Object.entries(entries).map(([format, data]) => [
+        `electron application/osclipboard;format="${format}"`,
+        new Blob([new Uint8Array(data)])
+      ])
+    )
+    await clipboard.write([new ClipboardItem(item)])
   }
 
   private escapeForPlist(value: string): string {
@@ -388,7 +403,7 @@ class FileSystemService extends IpcService {
   }
 
   @IpcMethod()
-  async fileExists(_context: IpcContext, filePath: string): Promise<boolean> {
+  async fileExists(filePath: string): Promise<boolean> {
     try {
       if (!filePath) {
         return false
@@ -407,7 +422,7 @@ class FileSystemService extends IpcService {
   }
 
   @IpcMethod()
-  async deleteFile(_context: IpcContext, filePath: string): Promise<boolean> {
+  async deleteFile(filePath: string): Promise<boolean> {
     try {
       if (!filePath) {
         return false

@@ -1,11 +1,11 @@
 import { BrowserWindow } from 'electron'
-import { type IpcContext, IpcMethod, IpcService } from 'electron-ipc-decorator'
+import { IpcMethod, IpcService } from 'electron-ipc-decorator'
 
 class WindowService extends IpcService {
   static readonly groupName = 'window'
 
   @IpcMethod()
-  minimize(_context: IpcContext): void {
+  minimize(): void {
     const window = BrowserWindow.getFocusedWindow()
     if (window) {
       window.minimize()
@@ -13,7 +13,7 @@ class WindowService extends IpcService {
   }
 
   @IpcMethod()
-  maximize(_context: IpcContext): void {
+  maximize(): void {
     const window = BrowserWindow.getFocusedWindow()
     if (window) {
       if (window.isMaximized()) {
@@ -25,7 +25,7 @@ class WindowService extends IpcService {
   }
 
   @IpcMethod()
-  close(_context: IpcContext): void {
+  close(): void {
     const window = BrowserWindow.getFocusedWindow()
     if (window) {
       window.close()
@@ -33,7 +33,7 @@ class WindowService extends IpcService {
   }
 
   @IpcMethod()
-  isMaximized(_context: IpcContext): boolean {
+  isMaximized(): boolean {
     const window = BrowserWindow.getFocusedWindow()
     return window ? window.isMaximized() : false
   }

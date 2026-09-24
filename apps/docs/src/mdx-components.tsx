@@ -36,9 +36,14 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
     ...defaultMdxComponents,
     img: (props) => {
-      const src = resolveImageSrc(props.src);
-      const sizeProps = resolveImageSize(props, src);
-      return <Image {...props} {...sizeProps} src={src} />;
+      // fumadocs-mdx turns local images into static imports, so `src` can be
+      // an object at runtime even though the HTML <img> type says otherwise.
+      const imageProps = props as unknown as React.ComponentProps<typeof Image>;
+      const src = resolveImageSrc(imageProps.src);
+      const sizeProps = resolveImageSize(imageProps, src);
+      return (
+        <Image {...imageProps} {...sizeProps} alt={imageProps.alt ?? ''} src={src} />
+      );
     },
     ...components,
   };

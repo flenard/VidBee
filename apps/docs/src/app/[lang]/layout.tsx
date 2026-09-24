@@ -4,13 +4,11 @@ import { defineI18nUI } from 'fumadocs-ui/i18n';
 import { i18n, isLocale } from '@/lib/i18n';
 
 const { provider } = defineI18nUI(i18n, {
-  translations: {
-    en: {
-      displayName: 'English',
-    },
-    zh: {
-      displayName: '中文',
-    },
+  en: {
+    displayName: 'English',
+  },
+  zh: {
+    displayName: '中文',
   },
 });
 

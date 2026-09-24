@@ -1,14 +1,11 @@
-import { type IpcContext, IpcMethod, IpcService } from 'electron-ipc-decorator'
+import { IpcMethod, IpcService } from 'electron-ipc-decorator'
 import { thumbnailCache } from '../../lib/thumbnail-cache'
 
 class ThumbnailService extends IpcService {
   static readonly groupName = 'thumbnail'
 
   @IpcMethod()
-  async getThumbnailPath(
-    _context: IpcContext,
-    url: string | null | undefined
-  ): Promise<string | null> {
+  async getThumbnailPath(url: string | null | undefined): Promise<string | null> {
     if (!url) {
       return null
     }

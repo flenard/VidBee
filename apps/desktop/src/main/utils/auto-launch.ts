@@ -15,15 +15,8 @@ export function applyAutoLaunchSetting(enabled: boolean): void {
 
   const updateSetting = () => {
     try {
-      const options: Parameters<typeof app.setLoginItemSettings>[0] = {
-        openAtLogin: enabled
-      }
-
-      if (process.platform === 'darwin') {
-        options.openAsHidden = true
-      }
-
-      app.setLoginItemSettings(options)
+      // Electron 44 removed `openAsHidden` (macOS ignored it since macOS 13).
+      app.setLoginItemSettings({ openAtLogin: enabled })
       log.info(`Auto launch ${enabled ? 'enabled' : 'disabled'}`)
     } catch (error) {
       log.error('Failed to update login item settings:', error)

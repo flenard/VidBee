@@ -11,16 +11,16 @@ import { Switch } from "@vidbee/ui/components/ui/switch";
 import type { LucideIcon } from "lucide-react";
 import {
 	Download,
-	Facebook,
 	FileText,
-	Github,
 	Link as LinkIcon,
 	MessageSquare,
 	RefreshCw,
-	Twitter,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import Facebook from "~icons/lucide/facebook";
+import Github from "~icons/lucide/github";
+import Twitter from "~icons/lucide/twitter";
 import { orpcClient } from "../../lib/orpc-client";
 import { AppShell } from "../layout/app-shell";
 
