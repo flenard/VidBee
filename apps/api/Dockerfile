@@ -5,7 +5,11 @@ ENV PATH=${PNPM_HOME}:${PATH}
 ENV YTDLP_PATH=/usr/bin/yt-dlp
 ENV FFMPEG_PATH=/usr/bin/ffmpeg
 
-RUN apk add --no-cache yt-dlp ffmpeg python3 make g++
+RUN apk add --no-cache ffmpeg python3 deno make g++
+
+# Alpine's yt-dlp package lags behind upstream. YouTube breaks old versions
+# quickly (HTTP 403 on video data), so pull the latest release on every build.
+ADD --chmod=755 https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp /usr/bin/yt-dlp
 
 RUN corepack enable
 
