@@ -58,6 +58,8 @@ const resolvePreferredAudioExt = (videoExt: string | undefined): string | undefi
 // tiers (4K / 1080p高码率) when cookies are present even for accounts that
 // cannot actually fetch them; yt-dlp then errors at download time. The chain
 // below is the same one buildVideoFormatPreference uses for one-click.
+// Before it, the picked format alone: some sites (Wistia) list muxed files with
+// an unknown audio codec and no separate audio stream, so `+bestaudio` fails.
 const SINGLE_FORMAT_FALLBACK = 'bestvideo+bestaudio/best'
 
 const buildSingleVideoFormatSelector = (
@@ -70,10 +72,10 @@ const buildSingleVideoFormatSelector = (
 
   const preferredAudioExt = resolvePreferredAudioExt(format.ext)
   if (!preferredAudioExt) {
-    return `${formatId}+bestaudio/${SINGLE_FORMAT_FALLBACK}`
+    return `${formatId}+bestaudio/${formatId}/${SINGLE_FORMAT_FALLBACK}`
   }
 
-  return `${formatId}+bestaudio[ext=${preferredAudioExt}]/${formatId}+bestaudio/${SINGLE_FORMAT_FALLBACK}`
+  return `${formatId}+bestaudio[ext=${preferredAudioExt}]/${formatId}+bestaudio/${formatId}/${SINGLE_FORMAT_FALLBACK}`
 }
 
 interface DownloadDialogProps {

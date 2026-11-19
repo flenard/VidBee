@@ -53,21 +53,26 @@ const resolvePreferredAudioExt = (
 	return undefined;
 };
 
+// Fallbacks after `+bestaudio`: first the picked format alone (Wistia lists
+// muxed files with an unknown audio codec and no separate audio stream), then
+// best-available so a stale pick does not hard-fail.
+const SINGLE_FORMAT_FALLBACK = "bestvideo+bestaudio/best";
+
 const buildSingleVideoFormatSelector = (
 	formatId: string,
 	format: VideoFormat | undefined,
 ): string => {
 	if (!format || isMuxedVideoFormat(format)) {
-		return formatId;
+		return `${formatId}/${SINGLE_FORMAT_FALLBACK}`;
 	}
 
 	const preferredAudioExt = resolvePreferredAudioExt(format.ext);
 	if (!preferredAudioExt) {
-		return `${formatId}+bestaudio`;
+		return `${formatId}+bestaudio/${formatId}/${SINGLE_FORMAT_FALLBACK}`;
 	}
 
 	// Prefer same-container audio and keep a fallback when not available.
-	return `${formatId}+bestaudio[ext=${preferredAudioExt}]/${formatId}+bestaudio`;
+	return `${formatId}+bestaudio[ext=${preferredAudioExt}]/${formatId}+bestaudio/${formatId}/${SINGLE_FORMAT_FALLBACK}`;
 };
 
 interface DownloadDialogProps {
